@@ -5,6 +5,7 @@
 #include <grub/multiboot.h>
 #include <stdbool.h>
 #include <kernel/page.h>
+#include <stdlib.h>
 
 typedef void (*call_module_t)(void);
 
@@ -40,19 +41,14 @@ void kernel_main(uint32_t eax, uint32_t ebx) {
 
 	multiboot_module_t *module = (multiboot_module_t*) mbinfo->mods_addr;
 	call_module_t start_program = (call_module_t) module->mod_start;
-	uint32_t virt_page_address = ((uint32_t) module->mod_start) & 0xFFFFF000;
-	uint32_t phys_page_address = virt_page_address - 0xC0000000;
-
-	uint32_t page_directory_offset = virt_page_address >> 22;
-	uint32_t page_table_offset = (virt_page_address >> 12) & 0x03FF;//gets first 10 digits
-
-	
-	uint32_t *page_table = (uint32_t*) ((1023 << 22) | (page_directory_offset << 12));
-	page_table[page_table_offset] = phys_page_address | 0x03;
+	map_page(module->mod_start, module->mod_start - 0xC0000000, 0x03);
 
 	if (mbinfo->mods_count == 1 && mbinfo->flags & (1 << 3)) {
 		start_program();
 	}
+
+	//void *ptr = malloc(8);
+	//printf("%#.8X\n", ptr);
 	//printf("Start: %#.8X\nEnd:   %#.8X\nString: %s\n", module->mod_start, module->mod_end, module->cmdline);
 /*	
 	for (size_t j = 0; j < 10; j++) {

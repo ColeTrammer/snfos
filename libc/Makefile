@@ -38,6 +38,7 @@ string/memcpy.o \
 string/memmove.o \
 string/memset.o \
 string/strlen.o \
+stdlib/dynamic_allocation.o
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
