@@ -74,6 +74,7 @@ void *calloc(size_t n, size_t size) {
     return ptr;
 }
 
+//TODO: implement special cases where copying memory is unneeded
 void *realloc(void *ptr, size_t size) {
     void *new_ptr = malloc(size);
     memcpy(new_ptr, ptr, size);
@@ -83,10 +84,10 @@ void *realloc(void *ptr, size_t size) {
 
 void free(void *ptr) {
     if (ptr) {
-        metadata_t *block = ((metadata_t *) ptr) - 1;
+        metadata_t *block = ((metadata_t*) ptr) - 1;
         block->used = false;
         
-        /* Could give back memory to but it makes the allocator much slower
+        /* Could give back memory to page frame allocator but it makes the allocator much slower
 
         if (block == end && PAGE_BOUNDARY_END(block) < heap_end) {
             if (start != end)
