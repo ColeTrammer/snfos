@@ -1,10 +1,10 @@
 #include <stdio.h>
-
 #include <kernel/tty.h>
 #include <kernel/input.h>
 #include <grub/multiboot.h>
 #include <stdbool.h>
 #include <kernel/page.h>
+#include <kernel/heap.h>
 #include <stdlib.h>
 
 typedef void (*call_module_t)(void);
@@ -38,18 +38,53 @@ void kernel_main(uint32_t eax, uint32_t ebx) {
 	initialize_input();
 	
 	/* TESTS */
-
+	/*
 	multiboot_module_t *module = (multiboot_module_t*) mbinfo->mods_addr;
 	call_module_t start_program = (call_module_t) module->mod_start;
 	map_page(module->mod_start, module->mod_start - 0xC0000000, 0x03);
 
 	if (mbinfo->mods_count == 1 && mbinfo->flags & (1 << 3)) {
+		printf("Start: %#.8X\nEnd:   %#.8X\nString: %s\n", module->mod_start, module->mod_end, module->cmdline);
 		start_program();
 	}
+	*/
 
-	//void *ptr = malloc(8);
-	//printf("%#.8X\n", ptr);
-	//printf("Start: %#.8X\nEnd:   %#.8X\nString: %s\n", module->mod_start, module->mod_end, module->cmdline);
+/*
+	free(malloc(8));
+	for (size_t i = 0; i < 10000000; i++) {
+		free(malloc(i));
+	}
+	printf("%s\n", "finished");
+*/
+
+/*
+	uint8_t* a = malloc(8);
+	uint8_t* b = malloc(8);
+	uint8_t* c = malloc(8);
+	uint8_t* d = malloc(8);
+
+	printf("A: %#.8X  B: %#.8X C: %#.8X D: %#.8X E: %.8X\n", a, b, c, d, 0);
+	free(b);
+	uint8_t* e = malloc(7);
+	printf("A: %#.8X  B: %#.8X C: %#.8X D: %#.8X E: %.8X\n", a, 0, c, d, e);
+	free(c);
+	free(d);
+	b = malloc(16);
+	printf("A: %#.8X  B: %#.8X C: %#.8X D: %#.8X E: %.8X\n", a, b, 0, 0, e);
+
+	//free(b);
+	//b = malloc(64);
+
+	c = malloc(128);
+	d = malloc(8);
+	printf("A: %#.8X  B: %#.8X C: %#.8X D: %#.8X E: %.8X\n", a, b, c, d, e);
+	free(c);
+	free(d);
+	c = malloc(8);
+	d = malloc(8);
+	printf("A: %#.8X  B: %#.8X C: %#.8X D: %#.8X E: %.8X\n", a, b, c, d, e);
+*/
+
 /*	
 	for (size_t j = 0; j < 10; j++) {
 		for (size_t i = 0; i < 5; i++) {

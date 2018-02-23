@@ -35,7 +35,7 @@ uint32_t allocate_next_page() {
     return 0;
 }
 
-void free_page(uint32_t page) {
+void free_physical_page(uint32_t page) {
     uint32_t addr = page;
     addr &= 0xFFFFF000;
     uint32_t offset = addr / PAGE_SIZE / 32;
@@ -77,7 +77,7 @@ void *map_page(uint32_t virtual_address, uint32_t physical_address, uint16_t fla
     page_directory_t *page_directory = PAGE_DIRECTORY;
     page_table_t *page_table = PAGE_TABLE(page_directory_offset);
     if (!(page_directory->entries[page_directory_offset] & 1)) {    //missing page table
-        uint32_t phys_page_addr = (uint32_t) allocate_next_page();
+        uint32_t phys_page_addr = allocate_next_page();
         page_directory->entries[page_directory_offset] = phys_page_addr | 0x03; //maps in page table
         memset(page_table, 0, PAGE_SIZE);
     }
@@ -97,7 +97,7 @@ void unmap_virtual_address(void *_virtual_address) {
     uint32_t phys_addr = page_table->entries[page_table_offset]; // dont need to normalize address to page bound b/c free page does this automatically
     page_table->entries[page_table_offset] = 0;                  // clear page entry
     invlpg((void*) virtual_address);                                     // clear page cache
-    free_page(phys_addr);                                        // marks page as usable
+    free_physical_page(phys_addr);                                        // marks page as usable
 
     for (size_t i = 0; i < MAX_PAGE_TABLE_ENTRIES; i++) {        // checks to see if any page table entry is presenet
         if (page_table->entries[i] & 1)
@@ -106,6 +106,10 @@ void unmap_virtual_address(void *_virtual_address) {
     unmap_virtual_address(page_table);                           // removes PT if not
 }
 
+
+/** Gets the physical address of the page associated with
+ *  the virtual address passed in
+ */
 uint32_t get_physical_address(void *_virtual_address) {
     uint32_t virtual_address = ((uint32_t) _virtual_address) & 0xFFFFF000;
 

@@ -16,8 +16,10 @@ extern void kernel_physical_end(void);
 #define LAST_PAGE_DIRECTORY_INDEX (MAX_PAGE_DIRECTORY_ENTRIES - 1)
 #define LAST_PAGE_TABLE_INDEX (MAX_PAGE_TABLE_ENTRIES - 1)
 #define PAGE_DIRECTORY ((page_directory_t*) ((LAST_PAGE_DIRECTORY_INDEX << 22) | (LAST_PAGE_TABLE_INDEX << 12)))
-#define PAGE_TABLE(offset) ((page_table_t*) ((LAST_PAGE_DIRECTORY_INDEX << 22) | (offset << 12)))
-#define NUM_PAGES(start, end) ((end / PAGE_SIZE) - (start / PAGE_SIZE) + (end % PAGE_SIZE != 0 ? 1 : 0))
+#define PAGE_TABLE(offset) ((page_table_t*) ((LAST_PAGE_DIRECTORY_INDEX << 22) | ((offset) << 12)))
+#define PAGE_BOUNDARY_START(addr) (((uint32_t) (addr)) & 0xFFFFF000)
+#define PAGE_BOUNDARY_END(addr) (PAGE_BOUNDARY_START((addr)) + PAGE_SIZE)
+#define NUM_PAGES(start, end) (((end) / PAGE_SIZE) - ((start) / PAGE_SIZE) + ((end) % PAGE_SIZE != 0 ? 1 : 0))
 
 #define BITMAP_PAGES 32
 #define BITMAP_SIZE (PAGE_SIZE * BITMAP_PAGES)
@@ -48,7 +50,7 @@ uint32_t get_physical_address(void *virtual_address);
 
 void init_bitmap(multiboot_info_t *info);
 uint32_t allocate_next_page();
-void  free_page(uint32_t page);
+void  free_physical_page(uint32_t page);
 void *map_virtual_address(uint32_t virtual_address, uint16_t flags);
 void *map_page(uint32_t virtual_address, uint32_t physical_address, uint16_t flags);
 void  unmap_virtual_address(void *virtual_address);
