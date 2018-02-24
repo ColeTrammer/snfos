@@ -9,10 +9,12 @@ extern void kernel_virtual_start(void);
 extern void kernel_physical_start(void);
 extern void kernel_virtual_end(void);
 extern void kernel_physical_end(void);
+extern void kernel_page_table(void);
 
 #define PAGE_SIZE 4096
 #define MAX_PAGE_DIRECTORY_ENTRIES 1024
 #define MAX_PAGE_TABLE_ENTRIES 1024
+#define KERNEL_VIRTUAL_BASE 0xC0000000
 #define LAST_PAGE_DIRECTORY_INDEX (MAX_PAGE_DIRECTORY_ENTRIES - 1)
 #define LAST_PAGE_TABLE_INDEX (MAX_PAGE_TABLE_ENTRIES - 1)
 #define PAGE_DIRECTORY ((page_directory_t*) ((LAST_PAGE_DIRECTORY_INDEX << 22) | (LAST_PAGE_TABLE_INDEX << 12)))
@@ -31,6 +33,7 @@ extern void kernel_physical_end(void);
 #define PHYS_KERNEL_START ((uint32_t) &kernel_physical_start)
 #define VIRT_KERNEL_END ((uint32_t) &kernel_virtual_end)
 #define PHYS_KERNEL_END ((uint32_t) &kernel_physical_end)
+#define KERNEL_PAGE_TABLE_PHYSICAL_ADDRESS (((uint32_t) &kernel_page_table) - KERNEL_VIRTUAL_BASE)
 #define KERNEL_SIZE (VIRT_KERNEL_END - VIRT_KERNEL_START)
 #define NUM_INITIAL_KERNEL_PAGES (NUM_PAGES(PHYS_KERNEL_START, PHYS_KERNEL_END))
 

@@ -30,6 +30,7 @@ boot_page_directory:
 	.long (boot_page_directory - KERNEL_VIRTUAL_BASE + 0x03) # Map PTE to itself
 
 .align 0x1000
+.global kernel_page_table
 kernel_page_table:
 	.rept 1024
 		.long 0
@@ -106,4 +107,39 @@ higher_half:
 	cli
 1:	hlt
 	jmp 1b
+
+.global load_program
+load_program:
+	push %ebp
+	mov %esp, %ebp
+
+	push %eax
+
+	# Uses user process PD
+	mov 8(%ebp), %eax
+	mov %eax, %cr3
+
+	# Sets segment registers
+	mov $(0x20 | 0x03), %ax
+	mov %ax, %ds
+	mov %ax, %es
+	mov %ax, %fs
+	mov %ax, %gs
+
+	# Set up stack for iret
+	push $(0x20 | 0x03)             # ss
+	push $(KERNEL_VIRTUAL_BASE - 4) # esp
+	pushf                           # eflags
+	push $(0x18 | 0x03)             # cs
+	push $0x0                       # eip
+	
+	iret
+
+	.rept 6
+		pop %eax
+	.endr
+
+	pop %ebp
+	ret
+
 .size _start, . - _start

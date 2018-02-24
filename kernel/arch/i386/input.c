@@ -200,7 +200,7 @@ void initialize_input(void) {
 }
 
 void print_eax(uint32_t eax) {
-    printf("ASM: %d\n", eax);
+    printf("ASM: %#.8X\n", eax);
 }
 
 struct cpu_state {
@@ -236,11 +236,10 @@ void interupt_handler(struct cpu_state cpu, uint32_t interupt, struct stack_stat
     } else if (interupt != 255) {
         if (interupt == 14) {
             printf("%s\n", "Page Fault");
+            while (1);
         } else { 
             printf("Int: %d, Eax: %#X, Error: %d\n", interupt, cpu.eax, stack.error_code);
         }
-        asm volatile("cli");
-        while (1);
     }
 }
 

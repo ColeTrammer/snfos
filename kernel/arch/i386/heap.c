@@ -3,9 +3,12 @@
 #include <kernel/page.h>
 #include <stdio.h>
 
-static uint32_t heap_end = HEAP_START;
+static uint32_t heap_end = 0;
 
 void *alloc_page(size_t pages) {
+    if (heap_end == 0) {
+        heap_end = HEAP_START;
+    }
     void *start_new_block = (void*) heap_end;
     for (size_t i = 0; i < pages; i++) {
         map_virtual_address(heap_end, 0x03);

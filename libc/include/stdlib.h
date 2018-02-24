@@ -11,6 +11,10 @@ extern "C" {
 __attribute__((__noreturn__))
 void abort(void);
 
+#if defined(__is_libk)
+void *malloc_pages(size_t pages);
+#endif
+
 void *malloc(size_t size);
 void *calloc(size_t items, size_t size);
 void *realloc(void *ptr, size_t size);

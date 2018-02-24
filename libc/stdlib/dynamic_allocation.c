@@ -23,6 +23,42 @@ static metadata_t *start = NULL;
 static metadata_t *end = NULL;
 static uint32_t heap_end = 0;
 
+#if defined(__is_libk)
+void *malloc_pages(size_t pages) {
+    if (pages == 0) {
+        return NULL;
+    }
+    metadata_t *block;
+    if (start == NULL) {
+        block = start = end = alloc_page(1);
+        heap_end = ((uint32_t) start) + PAGE_SIZE;
+    } else {
+        block = NEXT_BLOCK(end);
+    }
+    if (heap_end - ((uint32_t) block) < sizeof(metadata_t)) {
+        alloc_page(1);
+        heap_end += PAGE_SIZE;
+    }
+    
+    if (heap_end - ((uint32_t) block) >= 2 * sizeof(metadata_t) + sizeof(size_t) + 4) {
+        // make new block to take up the space
+        block->size = heap_end - ((uint32_t) block) - (2 * sizeof(metadata_t)) - sizeof(size_t);
+        *ENDING_SIZE_FIELD(block) = block->size;
+        end = NEXT_BLOCK(block);
+    } else if (heap_end - ((uint32_t) block) >= sizeof(metadata_t)) {
+        //extend prev block to take up the space
+        block->size += heap_end - ((uint32_t) block) - sizeof(metadata_t);
+        *ENDING_SIZE_FIELD(block) = block->size;
+        end = NEXT_BLOCK(block);
+    }
+    alloc_page(pages + 1);
+    heap_end += PAGE_SIZE * (pages + 1);
+    end->size = PAGE_SIZE * pages;
+    *ENDING_SIZE_FIELD(end) = end->size;
+    return end + 1;
+}
+#endif
+
 void *malloc(size_t size) {
     if (size == 0)
         return NULL;
@@ -41,7 +77,7 @@ void *malloc(size_t size) {
         if (!block->used && block->size >= size) {
             block->used = true;
             //splits if there is room for 4 bytes
-            if (block->size - size > sizeof(metadata_t) + sizeof(size_t) + 4) {
+            if (block->size - size >= sizeof(metadata_t) + sizeof(size_t) + 4) {
                 size_t old_size = block->size;
                 block->size = size;
                 *ENDING_SIZE_FIELD(block) = size;

@@ -19,8 +19,13 @@ kernel /boot/myos.kernel
 module /modules/program
 EOF
 
-i686-elf-as --32 -o kernel/modules/program.o kernel/modules/program.S
-i686-elf-ld -Ttext 0 --oformat binary -o isodir/modules/program kernel/modules/program.o
+cd ./kernel/modules
+i686-elf-as -o start.o start.S
+i686-elf-gcc -o program.o program.c -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs
+i686-elf-ld -T link.ld -o ../../isodir/modules/program start.o program.o
+cd ..
+cd ..
+# i686-elf-ld -T kernel/modules/link.ld -o isodir/modules/program kernel/modules/program.o
 # nasm -f bin kernel/modules/program.S -o isodir/modules/program
 
 genisoimage -R                              \

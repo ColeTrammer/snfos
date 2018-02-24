@@ -1,0 +1,10 @@
+
+kernel/modules/program.o:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+00000000 <_start>:
+   0:	b8 ef be ad de       	mov    $0xdeadbeef,%eax
+   5:	cd 00                	int    $0x0
+   7:	c3                   	ret    
