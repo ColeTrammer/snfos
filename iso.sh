@@ -21,12 +21,9 @@ EOF
 
 cd ./kernel/modules
 i686-elf-as -o start.o start.S
-i686-elf-gcc -o program.o program.c -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs
-i686-elf-ld -T link.ld -o ../../isodir/modules/program start.o program.o
-cd ..
-cd ..
-# i686-elf-ld -T kernel/modules/link.ld -o isodir/modules/program kernel/modules/program.o
-# nasm -f bin kernel/modules/program.S -o isodir/modules/program
+i686-elf-gcc -o program.o program.c start.o -m32 -O2 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -T link.ld
+i686-elf-objcopy -O binary program.o ../../isodir/modules/program
+cd ../..
 
 genisoimage -R                              \
 			-b boot/grub/stage2_eltorito    \

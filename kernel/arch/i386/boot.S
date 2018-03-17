@@ -108,15 +108,16 @@ higher_half:
 1:	hlt
 	jmp 1b
 
+.size _start, . - _start
+
 .global load_program
 load_program:
-	push %ebp
-	mov %esp, %ebp
-
-	push %eax
+	# Set esp in tss
+	mov $(tss + 4), %eax
+	mov %esp, (%eax)
 
 	# Uses user process PD
-	mov 8(%ebp), %eax
+	mov 4(%esp), %eax
 	mov %eax, %cr3
 
 	# Sets segment registers
@@ -134,12 +135,3 @@ load_program:
 	push $0x0                       # eip
 	
 	iret
-
-	.rept 6
-		pop %eax
-	.endr
-
-	pop %ebp
-	ret
-
-.size _start, . - _start

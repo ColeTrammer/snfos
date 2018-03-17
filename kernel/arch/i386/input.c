@@ -185,7 +185,10 @@ void initialize_input(void) {
         uint32_t addr = (uint32_t) interupt_handlers[i];
         idt[i].address_low = (uint16_t) addr;
         idt[i].segment = 0x0008;
-        idt[i].flags = 0x8E00;
+        if (i == 0x80)
+            idt[i].flags = 0xEE00;
+        else
+            idt[i].flags = 0x8E00;
         idt[i].address_high = (uint16_t) (addr >> 16);
     }
 
@@ -235,8 +238,10 @@ void interupt_handler(struct cpu_state cpu, uint32_t interupt, struct stack_stat
         PIC_sendEOI(interupt - 0x20);
     } else if (interupt != 255) {
         if (interupt == 14) {
-            printf("%s\n", "Page Fault");
-            while (1);
+            uint32_t addr;
+            asm("mov %%cr2, %0" : "=r" (addr));
+            printf("Page Fault: %#.8X\n", addr);
+            //while (1);
         } else { 
             printf("Int: %d, Eax: %#X, Error: %d\n", interupt, cpu.eax, stack.error_code);
         }

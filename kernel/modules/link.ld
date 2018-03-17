@@ -1,5 +1,3 @@
-OUTPUT_FORMAT("binary")    /* output flat binary */
-
 SECTIONS
 {
     . = 0;                 /* relocate to address 0 */

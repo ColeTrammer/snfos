@@ -9,6 +9,7 @@
 #include <kernel/heap.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 extern void load_program(uint32_t phys_addr);
 
@@ -29,6 +30,7 @@ multiboot_info_t *virtualize_multiboot_info(unsigned int ebx) {
 }
 
 void kernel_main(uint32_t eax, uint32_t ebx) {
+	
 	terminal_initialize();
 	if (eax != 0x2BADB002) {
 		printf("ERROR: INVALID BOOTLOADER\neax: %#.8X\nebx: %#.8X\n", eax, ebx);
@@ -57,12 +59,13 @@ void kernel_main(uint32_t eax, uint32_t ebx) {
 	
 	multiboot_module_t *module = (multiboot_module_t*) mbinfo->mods_addr;
 	void *temp_page = map_page(HEAP_START - PAGE_SIZE, module->mod_start - 0xC0000000, 0x03);
-
+	
 	size_t num_code_pages = ((module->mod_end - module->mod_start) / PAGE_SIZE) + 1;
 	uint8_t *program_code = malloc_pages(num_code_pages);
 	for (size_t i = 0; i < num_code_pages; i++) { 
 		process->code_page_table.entries[i] = get_physical_address(&program_code[i * PAGE_SIZE]) | 0x05;
 	}
+
 	memcpy(program_code, temp_page, module->mod_end - module->mod_start);
 
 	unmap_virtual_address(temp_page);

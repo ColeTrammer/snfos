@@ -1,5 +1,23 @@
 .section .text
 
+# System Call Handler
+.global interupt_handler_128
+interupt_handler_128:
+    push %ebx
+    push %ecx
+    push %edx
+    push %ebp
+    push %eax
+
+    call puts
+
+    pop %eax
+    pop %ebp
+    pop %edx
+    pop %ecx
+    pop %ebx
+    iret
+
 .macro no_error_code_interupt_handler n
 .global interupt_handler_\n
 interupt_handler_\n:
@@ -163,7 +181,7 @@ no_error_code_interupt_handler 124
 no_error_code_interupt_handler 125
 no_error_code_interupt_handler 126
 no_error_code_interupt_handler 127
-no_error_code_interupt_handler 128
+# no_error_code_interupt_handler 128 SYSTEM CALL NOW
 no_error_code_interupt_handler 129
 no_error_code_interupt_handler 130
 no_error_code_interupt_handler 131
