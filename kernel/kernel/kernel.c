@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <kernel/module.h>
 
 extern void load_program(uint32_t phys_addr);
 
@@ -21,11 +22,6 @@ multiboot_info_t *virtualize_multiboot_info(unsigned int ebx) {
 	multiboot_info_t *mbinfo = (multiboot_info_t*) to_virtual(ebx);
 	mbinfo->mods_addr = to_virtual(mbinfo->mods_addr);
 	mbinfo->mmap_addr = to_virtual(mbinfo->mmap_addr);
-
-	multiboot_module_t *module = (multiboot_module_t*) mbinfo->mods_addr;
-	module->mod_start = to_virtual(module->mod_start);
-	module->mod_end = to_virtual(module->mod_end);
-	module->cmdline = to_virtual(module->cmdline);
 	return mbinfo;	
 }
 
@@ -41,42 +37,24 @@ void kernel_main(uint32_t eax, uint32_t ebx) {
 	init_bitmap(mbinfo);
 	
 	initialize_input();
-	
-	typedef struct _process {
-		page_directory_t page_directory;
-		page_table_t code_page_table;
-		page_table_t stack_page_table;
-	} __attribute__((packed)) process_t;
-
-	process_t *process = malloc_pages(sizeof(process_t) / PAGE_SIZE);
-	process->page_directory.entries[LAST_PAGE_DIRECTORY_INDEX] = get_physical_address(&process->page_directory) | 0x03;
-	process->page_directory.entries[KERNEL_VIRTUAL_BASE >> 22] = KERNEL_PAGE_TABLE_PHYSICAL_ADDRESS | 0x03;
-	process->page_directory.entries[0] = get_physical_address(&process->code_page_table) | 0x05;
-	process->page_directory.entries[(KERNEL_VIRTUAL_BASE >> 22) - 1] = get_physical_address(&process->stack_page_table) | 0x07;
-	
-	process->stack_page_table.entries[LAST_PAGE_TABLE_INDEX] = get_physical_address((void*) alloc_page(1)) | 0x07;
 	/* TESTS */
 	
 	multiboot_module_t *module = (multiboot_module_t*) mbinfo->mods_addr;
-	void *temp_page = map_page(HEAP_START - PAGE_SIZE, module->mod_start - 0xC0000000, 0x03);
-	
-	size_t num_code_pages = ((module->mod_end - module->mod_start) / PAGE_SIZE) + 1;
-	uint8_t *program_code = malloc_pages(num_code_pages);
-	for (size_t i = 0; i < num_code_pages; i++) { 
-		process->code_page_table.entries[i] = get_physical_address(&program_code[i * PAGE_SIZE]) | 0x05;
-	}
+	//module++;
 
-	memcpy(program_code, temp_page, module->mod_end - module->mod_start);
+	process_t *process = load_module(module);
 
-	unmap_virtual_address(temp_page);
-
-	if (mbinfo->mods_count == 1 && mbinfo->flags & (1 << 3)) {
-		printf("Start: %#.8X\nEnd:   %#.8X\nString: %s\n", module->mod_start, module->mod_end, module->cmdline);
-		printf("Process:        %#.8X\n", process);
-		printf("Page Directory: %#.8X\n", &process->page_directory);
-		printf("Kernel PT:      %#.8X\n", KERNEL_PAGE_TABLE_PHYSICAL_ADDRESS);
+	if (mbinfo->mods_count == 2 && mbinfo->flags & (1 << 3)) {
+		//printf("Start: %#.8X\nEnd:   %#.8X\nString: %s\n", module->mod_start, module->mod_end, module->cmdline + 0xC0000000);
+		//printf("Process:        %#.8X\n", process);
+		//printf("Page Directory: %#.8X\n", &process->page_directory);
+		//printf("Kernel PT:      %#.8X\n", KERNEL_PAGE_TABLE_PHYSICAL_ADDRESS);
 		load_program(get_physical_address(&process->page_directory));	
 	}		
+
+	//puts((void*) 0x1000);
+	//for (size_t i = 0; i < num_code_pages; i++)
+	//	printf("Code Page Table [%d]: %#.8X\n", i, process->code_page_table.entries[i]);
 
 /*
 	free(malloc(8));

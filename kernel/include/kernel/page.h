@@ -37,6 +37,12 @@ extern void kernel_page_table(void);
 #define KERNEL_SIZE (VIRT_KERNEL_END - VIRT_KERNEL_START)
 #define NUM_INITIAL_KERNEL_PAGES (NUM_PAGES(PHYS_KERNEL_START, PHYS_KERNEL_END))
 
+struct _page {
+    uint8_t entries[PAGE_SIZE];
+} __attribute__((packed));
+
+typedef struct _page page_t;
+
 struct _page_directory {
     uint32_t entries[MAX_PAGE_DIRECTORY_ENTRIES];
 } __attribute__((packed));

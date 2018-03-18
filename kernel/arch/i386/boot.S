@@ -119,7 +119,7 @@ load_program:
 	# Uses user process PD
 	mov 4(%esp), %eax
 	mov %eax, %cr3
-
+	# ret
 	# Sets segment registers
 	mov $(0x20 | 0x03), %ax
 	mov %ax, %ds

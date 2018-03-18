@@ -16,13 +16,16 @@ timeout=0
 title os
 kernel /boot/myos.kernel
 
-module /modules/program
+module /modules/program1.bin
+module /modules/program2.bin
 EOF
 
 cd ./kernel/modules
 i686-elf-as -o start.o start.S
-i686-elf-gcc -o program.o program.c start.o -m32 -O2 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -T link.ld
-i686-elf-objcopy -O binary program.o ../../isodir/modules/program
+i686-elf-gcc -o program1.o program1.c start.o -m32 -O2 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -T link.ld
+i686-elf-objcopy -O binary program1.o ../../isodir/modules/program1.bin
+i686-elf-gcc -o program2.o program2.c start.o -m32 -O2 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -T link.ld
+i686-elf-objcopy -O binary program2.o ../../isodir/modules/program2.bin
 cd ../..
 
 genisoimage -R                              \

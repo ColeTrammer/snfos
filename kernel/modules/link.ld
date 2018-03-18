@@ -8,13 +8,13 @@ SECTIONS
         *(.text)           /* include all other .text sections */
     }
 
-    .data ALIGN(4):
-    {
-        *(.data)
-    }
-
     .rodata ALIGN(4):
     {
         *(.rodata*)
+    }
+
+    .data ALIGN(4):
+    {
+        *(.data)
     }
 }

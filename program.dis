@@ -25,7 +25,7 @@ Disassembly of section .text.startup:
 
 00000020 <main>:
   20:	ba 0a 00 00 00       	mov    $0xa,%edx
-  25:	b9 3c 00 00 00       	mov    $0x3c,%ecx
+  25:	b9 00 20 00 00       	mov    $0x2000,%ecx
   2a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
   30:	89 c8                	mov    %ecx,%eax
   32:	cd 80                	int    $0x80
@@ -33,47 +33,56 @@ Disassembly of section .text.startup:
   37:	75 f7                	jne    30 <main+0x10>
   39:	f3 c3                	repz ret 
 
+Disassembly of section .data:
+
+00001000 <_GLOBAL_OFFSET_TABLE_-0x4>:
+    1000:	00 00                	add    %al,(%eax)
+	...
+
 Disassembly of section .rodata:
 
-0000003c <_GLOBAL_OFFSET_TABLE_>:
-  3c:	50                   	push   %eax
-  3d:	72 6f                	jb     ae <_GLOBAL_OFFSET_TABLE_+0x72>
-  3f:	67 72 61             	addr16 jb a3 <_GLOBAL_OFFSET_TABLE_+0x67>
-  42:	6d                   	insl   (%dx),%es:(%edi)
-  43:	20 31                	and    %dh,(%ecx)
+00002000 <.rodata>:
+    2000:	50                   	push   %eax
+    2001:	72 6f                	jb     2072 <_GLOBAL_OFFSET_TABLE_+0x106e>
+    2003:	67 72 61             	addr16 jb 2067 <_GLOBAL_OFFSET_TABLE_+0x1063>
+    2006:	6d                   	insl   (%dx),%es:(%edi)
+    2007:	20 31                	and    %dh,(%ecx)
 	...
 
 Disassembly of section .eh_frame:
 
-00000048 <.eh_frame>:
-  48:	14 00                	adc    $0x0,%al
-  4a:	00 00                	add    %al,(%eax)
-  4c:	00 00                	add    %al,(%eax)
-  4e:	00 00                	add    %al,(%eax)
-  50:	01 7a 52             	add    %edi,0x52(%edx)
-  53:	00 01                	add    %al,(%ecx)
-  55:	7c 08                	jl     5f <_GLOBAL_OFFSET_TABLE_+0x23>
-  57:	01 1b                	add    %ebx,(%ebx)
-  59:	0c 04                	or     $0x4,%al
-  5b:	04 88                	add    $0x88,%al
-  5d:	01 00                	add    %eax,(%eax)
-  5f:	00 10                	add    %dl,(%eax)
-  61:	00 00                	add    %al,(%eax)
-  63:	00 1c 00             	add    %bl,(%eax,%eax,1)
-  66:	00 00                	add    %al,(%eax)
-  68:	a8 ff                	test   $0xff,%al
-  6a:	ff                   	(bad)  
-  6b:	ff 09                	decl   (%ecx)
-  6d:	00 00                	add    %al,(%eax)
-  6f:	00 00                	add    %al,(%eax)
-  71:	00 00                	add    %al,(%eax)
-  73:	00 10                	add    %dl,(%eax)
-  75:	00 00                	add    %al,(%eax)
-  77:	00 30                	add    %dh,(%eax)
-  79:	00 00                	add    %al,(%eax)
-  7b:	00 a4 ff ff ff 1b 00 	add    %ah,0x1bffff(%edi,%edi,8)
-  82:	00 00                	add    %al,(%eax)
-  84:	00 00                	add    %al,(%eax)
+0000200c <.eh_frame>:
+    200c:	14 00                	adc    $0x0,%al
+    200e:	00 00                	add    %al,(%eax)
+    2010:	00 00                	add    %al,(%eax)
+    2012:	00 00                	add    %al,(%eax)
+    2014:	01 7a 52             	add    %edi,0x52(%edx)
+    2017:	00 01                	add    %al,(%ecx)
+    2019:	7c 08                	jl     2023 <_GLOBAL_OFFSET_TABLE_+0x101f>
+    201b:	01 1b                	add    %ebx,(%ebx)
+    201d:	0c 04                	or     $0x4,%al
+    201f:	04 88                	add    $0x88,%al
+    2021:	01 00                	add    %eax,(%eax)
+    2023:	00 10                	add    %dl,(%eax)
+    2025:	00 00                	add    %al,(%eax)
+    2027:	00 1c 00             	add    %bl,(%eax,%eax,1)
+    202a:	00 00                	add    %al,(%eax)
+    202c:	e4 df                	in     $0xdf,%al
+    202e:	ff                   	(bad)  
+    202f:	ff 09                	decl   (%ecx)
+    2031:	00 00                	add    %al,(%eax)
+    2033:	00 00                	add    %al,(%eax)
+    2035:	00 00                	add    %al,(%eax)
+    2037:	00 10                	add    %dl,(%eax)
+    2039:	00 00                	add    %al,(%eax)
+    203b:	00 30                	add    %dh,(%eax)
+    203d:	00 00                	add    %al,(%eax)
+    203f:	00 e0                	add    %ah,%al
+    2041:	df ff                	(bad)  
+    2043:	ff 1b                	lcall  *(%ebx)
+    2045:	00 00                	add    %al,(%eax)
+    2047:	00 00                	add    %al,(%eax)
+    2049:	00 00                	add    %al,(%eax)
 	...
 
 Disassembly of section .comment:
