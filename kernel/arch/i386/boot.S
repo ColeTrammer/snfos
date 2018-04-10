@@ -8,6 +8,9 @@
 .set KERNEL_VIRTUAL_BASE, 0xC0000000
 .set KERNEL_PAGE_NUMBER, (KERNEL_VIRTUAL_BASE >> 22)
 
+.global KERNEL_STACK_START
+.set KERNEL_STACK_START, ((1023 << 22) - 4)
+
 # Declare a header as in the Multiboot Standard.
 .section .multiboot
 .align 4
@@ -84,7 +87,7 @@ enbable_paging:
 	jmp *%ecx
 
 higher_half:
-	movw $0, (boot_page_directory)
+	movl $0, (boot_page_directory)
 	invlpg (0)
 
 	# Set up stack
@@ -112,14 +115,20 @@ higher_half:
 
 .global load_program
 load_program:
-	# Set esp in tss
-	mov $(tss + 4), %eax
-	mov %esp, (%eax)
-
 	# Uses user process PD
 	mov 4(%esp), %eax
 	mov %eax, %cr3
-	# ret
+# 	ret
+#	mov (%esp), %eax
+	
+
+#	mov $KERNEL_STACK_START, %esp
+#	push %eax
+	# push %eax
+	# call print_eax
+# llll:
+	# jmp llll
+#	ret
 	# Sets segment registers
 	mov $(0x20 | 0x03), %ax
 	mov %ax, %ds
@@ -133,5 +142,5 @@ load_program:
 	pushf                           # eflags
 	push $(0x18 | 0x03)             # cs
 	push $0x0                       # eip
-	
+
 	iret

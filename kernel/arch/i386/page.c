@@ -45,7 +45,15 @@ void free_physical_page(uint32_t page) {
     freed = true;
 }
 
+bool check_used(void *phys_addr) {
+    uint32_t addr = ((uint32_t) phys_addr) & 0xFFFFF000;
+    uint32_t offset = addr / PAGE_SIZE / 32;
+    uint32_t bit_num = (addr / PAGE_SIZE) % 32;
+    return *(BITMAP_START + offset) & (1 << bit_num);
+}
+
 void mark_used(void *start, size_t num) {
+    //printf("Used: %#.8X; Num: %d\n", start, num);
     uint32_t addr = (uint32_t) start;
     addr &= 0xFFFFF000;
     uint32_t offset = addr / PAGE_SIZE / 32;
@@ -67,6 +75,9 @@ void *map_virtual_address(uint32_t virtual_address, uint16_t flags) {
     return map_page(virtual_address, allocate_next_page(), flags);
 }
 
+/**
+ * Does not mark the physical_address parameter as used!!!
+ */
 void *map_page(uint32_t virtual_address, uint32_t physical_address, uint16_t flags) {
     virtual_address  &= 0xFFFFF000;    //guantees address is on the page boundary
 	physical_address &= 0xFFFFF000;
@@ -117,7 +128,7 @@ uint32_t get_physical_address(void *_virtual_address) {
     uint32_t page_table_offset = (virtual_address >> 12) & 0x03FF;
 
     page_table_t *page_table = PAGE_TABLE(page_directory_offset);
-    return page_table->entries[page_table_offset] & 0xFFFFF000;
+    return (page_table->entries[page_table_offset] & 0xFFFFF000) | (((uint32_t) _virtual_address) & 0x00000FFF);
 }
 
 void init_bitmap(multiboot_info_t *info) {
@@ -125,7 +136,7 @@ void init_bitmap(multiboot_info_t *info) {
     mark_used((void*) PHYS_KERNEL_START, NUM_INITIAL_KERNEL_PAGES);
     multiboot_module_t *modules = (multiboot_module_t*) info->mods_addr;
     for (size_t i = 0; i < info->mods_count; i++) {
-        mark_used((void*) modules[i].mod_start - 0xC0000000, NUM_PAGES(modules[i].mod_start, modules[i].mod_end));
+        mark_used((void*) modules[i].mod_start, NUM_PAGES(modules[i].mod_start, modules[i].mod_end));
     }
 
     if (info->flags & (1 << 6)) {

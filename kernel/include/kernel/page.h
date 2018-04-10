@@ -63,5 +63,9 @@ void  free_physical_page(uint32_t page);
 void *map_virtual_address(uint32_t virtual_address, uint16_t flags);
 void *map_page(uint32_t virtual_address, uint32_t physical_address, uint16_t flags);
 void  unmap_virtual_address(void *virtual_address);
+#if defined(__is_kernel)
+#include <stdbool.h>
+bool  check_used(void *phys_addr);
+#endif
 
 #endif

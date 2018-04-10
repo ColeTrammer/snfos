@@ -9,6 +9,12 @@ interupt_handler_128:
     push %ebp
     push %eax
 
+#     push %esp
+#     call print_eax
+#     add $4, %esp
+    # cli
+# lll:
+    # jmp lll
     call puts
 
     pop %eax

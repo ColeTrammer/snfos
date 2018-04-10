@@ -88,7 +88,16 @@ load_kernel:
     movw %cx, 2(%edx)
     shr $16, %ecx
     movb %cl, 4(%edx) 
-    movb %ch, 7(%edx)   
+    movb %ch, 7(%edx)
+
+    # Set esp in tss
+	mov $(tss + 4), %ecx
+	movl $KERNEL_STACK_START, (%ecx)   
+
+    # mov %esp, %eax
+    # push %esp
+    # call print_eax
+    # add $4, %esp
 
     # Loads tss segment
     mov $0x28, %cx 

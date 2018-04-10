@@ -238,12 +238,14 @@ void interupt_handler(struct cpu_state cpu, uint32_t interupt, struct stack_stat
         PIC_sendEOI(interupt - 0x20);
     } else if (interupt != 255) {
         if (interupt == 14) {
-            uint32_t addr;
-            asm("mov %%cr2, %0" : "=r" (addr));
-            printf("Page Fault: %#.8X\n", addr);
-            //while (1);
+            uint32_t cr2;
+            uint32_t cr3;
+            asm("mov %%cr2, %0" : "=r" (cr2));
+            asm("mov %%cr3, %0" : "=r" (cr3));
+            printf("CR2: %#.8X   Error Code: %d   Eip: %#.8X   CR3: %#.8X\n", cr2, stack.error_code, stack.eip, cr3);
+            while (1);
         } else { 
-            printf("Int: %d, Eax: %#X, Error: %d\n", interupt, cpu.eax, stack.error_code);
+            printf("Int: %d, Eax: %#.8X, Error: %d, Eip: %#.8X\n", interupt, cpu.eax, stack.error_code, stack.eip);
         }
     }
 }

@@ -43,6 +43,7 @@ void *malloc_pages(size_t pages) {
     if (heap_end - ((uint32_t) block) >= 2 * sizeof(metadata_t) + sizeof(size_t) + 4) {
         // make new block to take up the space
         block->size = heap_end - ((uint32_t) block) - (2 * sizeof(metadata_t)) - sizeof(size_t);
+        block->used = false;
         *ENDING_SIZE_FIELD(block) = block->size;
         end = NEXT_BLOCK(block);
     } else if (heap_end - ((uint32_t) block) >= sizeof(metadata_t)) {
@@ -55,6 +56,10 @@ void *malloc_pages(size_t pages) {
     heap_end += PAGE_SIZE * (pages + 1);
     end->size = PAGE_SIZE * pages;
     *ENDING_SIZE_FIELD(end) = end->size;
+    end->used = true;
+
+    // printf("*Loc: %#.8X;  Size: %5u  Used: %u\n", end, end->size, end->used);
+    
     return end + 1;
 }
 #endif
@@ -86,6 +91,9 @@ void *malloc(size_t size) {
                 next_block->size = old_size - size - sizeof(metadata_t) - sizeof(size_t);
                 *ENDING_SIZE_FIELD(next_block) = next_block->size;
             }   
+
+            //printf("**Loc: %#.8X;  Size: %5u  Used: %u\n", block, block->size, block->used);
+
             return block + 1;
         }
         block = NEXT_BLOCK(block);
@@ -100,6 +108,9 @@ void *malloc(size_t size) {
     end->used = true;
     end->size = size;
     *ENDING_SIZE_FIELD(end) = size;
+
+    //printf("**Loc: %#.8X;  Size: %5u  Used: %u\n", block, block->size, block->used);
+
     return end + 1;
 }
 
@@ -150,5 +161,15 @@ void free(void *ptr) {
             PREV_BLOCK(block)->size += sizeof(size_t) + sizeof(metadata_t) + block->size;
             *ENDING_SIZE_FIELD(block) = PREV_BLOCK(block)->size;
         }
+    } 
+    
+    else {
+        metadata_t *block = start;
+        while (block != end) {
+            printf("***Phys Loc: %#.8X;  Virt Loc: %#.8X;   Size: %5u  Used: %u\n", get_physical_address(block), block, block->size, block->used);
+            block = NEXT_BLOCK(block);
+        }
+        printf("***Phys Loc: %#.8X;  Virt Loc: %#.8X;   Size: %5u  Used: %u\n", get_physical_address(end), end, end->size, end->used);
     }
+    
 }

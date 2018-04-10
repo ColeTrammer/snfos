@@ -11,7 +11,7 @@ extern "C" {
 __attribute__((__noreturn__))
 void abort(void);
 
-#if defined(__is_libk)
+#if defined(__is_kernel)
 void *malloc_pages(size_t pages);
 #endif
 

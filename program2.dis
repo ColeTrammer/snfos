@@ -1,0 +1,94 @@
+
+kernel/modules/program2.o:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+00000000 <_start>:
+   0:	e8 1b 00 00 00       	call   20 <main>
+
+00000005 <l>:
+   5:	eb fe                	jmp    5 <l>
+   7:	66 90                	xchg   %ax,%ax
+   9:	66 90                	xchg   %ax,%ax
+   b:	66 90                	xchg   %ax,%ax
+   d:	66 90                	xchg   %ax,%ax
+   f:	90                   	nop
+
+00000010 <print>:
+  10:	8b 54 24 04          	mov    0x4(%esp),%edx
+  14:	89 d0                	mov    %edx,%eax
+  16:	cd 80                	int    $0x80
+  18:	c3                   	ret    
+
+Disassembly of section .text.startup:
+
+00000020 <main>:
+  20:	ba 0a 00 00 00       	mov    $0xa,%edx
+  25:	b9 00 10 00 00       	mov    $0x1000,%ecx
+  2a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  30:	89 c8                	mov    %ecx,%eax
+  32:	cd 80                	int    $0x80
+  34:	83 ea 01             	sub    $0x1,%edx
+  37:	75 f7                	jne    30 <main+0x10>
+  39:	f3 c3                	repz ret 
+
+Disassembly of section .rodata:
+
+00001000 <.rodata>:
+    1000:	50                   	push   %eax
+    1001:	72 6f                	jb     1072 <_GLOBAL_OFFSET_TABLE_+0x26>
+    1003:	67 72 61             	addr16 jb 1067 <_GLOBAL_OFFSET_TABLE_+0x1b>
+    1006:	6d                   	insl   (%dx),%es:(%edi)
+    1007:	20 32                	and    %dh,(%edx)
+	...
+
+Disassembly of section .eh_frame:
+
+0000100c <_GLOBAL_OFFSET_TABLE_-0x40>:
+    100c:	14 00                	adc    $0x0,%al
+    100e:	00 00                	add    %al,(%eax)
+    1010:	00 00                	add    %al,(%eax)
+    1012:	00 00                	add    %al,(%eax)
+    1014:	01 7a 52             	add    %edi,0x52(%edx)
+    1017:	00 01                	add    %al,(%ecx)
+    1019:	7c 08                	jl     1023 <main+0x1003>
+    101b:	01 1b                	add    %ebx,(%ebx)
+    101d:	0c 04                	or     $0x4,%al
+    101f:	04 88                	add    $0x88,%al
+    1021:	01 00                	add    %eax,(%eax)
+    1023:	00 10                	add    %dl,(%eax)
+    1025:	00 00                	add    %al,(%eax)
+    1027:	00 1c 00             	add    %bl,(%eax,%eax,1)
+    102a:	00 00                	add    %al,(%eax)
+    102c:	e4 ef                	in     $0xef,%al
+    102e:	ff                   	(bad)  
+    102f:	ff 09                	decl   (%ecx)
+    1031:	00 00                	add    %al,(%eax)
+    1033:	00 00                	add    %al,(%eax)
+    1035:	00 00                	add    %al,(%eax)
+    1037:	00 10                	add    %dl,(%eax)
+    1039:	00 00                	add    %al,(%eax)
+    103b:	00 30                	add    %dh,(%eax)
+    103d:	00 00                	add    %al,(%eax)
+    103f:	00 e0                	add    %ah,%al
+    1041:	ef                   	out    %eax,(%dx)
+    1042:	ff                   	(bad)  
+    1043:	ff 1b                	lcall  *(%ebx)
+    1045:	00 00                	add    %al,(%eax)
+    1047:	00 00                	add    %al,(%eax)
+    1049:	00 00                	add    %al,(%eax)
+	...
+
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	47                   	inc    %edi
+   1:	43                   	inc    %ebx
+   2:	43                   	inc    %ebx
+   3:	3a 20                	cmp    (%eax),%ah
+   5:	28 47 4e             	sub    %al,0x4e(%edi)
+   8:	55                   	push   %ebp
+   9:	29 20                	sub    %esp,(%eax)
+   b:	36 2e 34 2e          	ss cs xor $0x2e,%al
+   f:	30 00                	xor    %al,(%eax)
