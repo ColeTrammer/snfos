@@ -7,14 +7,14 @@ mkdir -p isodir/boot
 mkdir -p isodir/boot/grub
 mkdir -p isodir/modules
 
-cp sysroot/boot/myos.kernel isodir/boot/myos.kernel
+cp sysroot/boot/snfos.kernel isodir/boot/snfos.kernel
 cp kernel/arch/i386/stage2_eltorito isodir/boot/grub
 cat > isodir/boot/grub/menu.lst << EOF
 default=0
 timeout=0
 
 title os
-kernel /boot/myos.kernel
+kernel /boot/snfos.kernel
 
 module /modules/program1.bin
 module /modules/program2.bin
@@ -36,5 +36,5 @@ genisoimage -R                              \
 			-input-charset utf8             \
 			-quiet                          \
 			-boot-info-table                \
-			-o myos.iso                     \
+			-o snfos.iso                     \
 			isodir

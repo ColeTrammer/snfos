@@ -1,5 +1,5 @@
 
-isodir/boot/myos.kernel:     file format elf32-i386
+isodir/boot/snfos.kernel:     file format elf32-i386
 
 
 Disassembly of section .text:
