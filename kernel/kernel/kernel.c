@@ -9,8 +9,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <kernel/module.h>
-
-extern void load_program(uint32_t phys_addr);
+#include <kernel/process.h>
 
 unsigned int to_virtual(uint32_t in) {
 	return in + 0xC0000000;
@@ -39,7 +38,7 @@ void kernel_main(uint32_t eax, uint32_t ebx) {
 	multiboot_module_t *module = (multiboot_module_t*) mbinfo->mods_addr;
 	
 	process_memory_t *process1 = load_module(module);
-	process_memory_t *process2 = load_module(module + 1);
+	//process_memory_t *process2 = load_module(module + 1);
 
 	if (mbinfo->mods_count == 2 && mbinfo->flags & (1 << 3)) {
 		//printf("Start: %#.8X\nEnd:   %#.8X\nString: %s\n", module->mod_start, module->mod_end, module->cmdline + 0xC0000000);
@@ -51,7 +50,9 @@ void kernel_main(uint32_t eax, uint32_t ebx) {
 		//printf("Virt Ad: %#.8X\n", &process2->page_directory);
 		//free(NULL);
 		//free(malloc(1));
-		load_program(get_physical_address(&process1->page_directory));	
+		process_t *p1 = add_process(process1);
+		///*process_t *p2 = */add_process(process2);
+		run_process(p1);
 	}		
 	//printf("%#.8X\n", (1022 << 22) + (1023 << 12) - 4);
 	//*((uint32_t*) 0xFFBFEFFC) = 0xABCDDCBA;

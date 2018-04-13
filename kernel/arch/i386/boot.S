@@ -113,11 +113,11 @@ higher_half:
 
 .size _start, . - _start
 
-.global load_program
-load_program:
+# .global load_program
+# load_program:
 	# Uses user process PD
-	mov 4(%esp), %eax
-	mov %eax, %cr3
+#	mov 4(%esp), %eax
+#	mov %eax, %cr3
 # 	ret
 #	mov (%esp), %eax
 	
@@ -130,17 +130,17 @@ load_program:
 	# jmp llll
 #	ret
 	# Sets segment registers
-	mov $(0x20 | 0x03), %ax
-	mov %ax, %ds
-	mov %ax, %es
-	mov %ax, %fs
-	mov %ax, %gs
+	# mov $(0x20 | 0x03), %ax
+	# mov %ax, %ds
+	# mov %ax, %es
+	# mov %ax, %fs
+	# mov %ax, %gs
 
 	# Set up stack for iret
-	push $(0x20 | 0x03)             # ss
-	push $(KERNEL_VIRTUAL_BASE - 4) # esp
-	pushf                           # eflags
-	push $(0x18 | 0x03)             # cs
-	push $0x0                       # eip
+#	push $(0x20 | 0x03)             # ss
+#	push $(KERNEL_VIRTUAL_BASE - 4) # esp
+#	pushf                           # eflags
+#	push $(0x18 | 0x03)             # cs
+#	push $0x0                       # eip
 
-	iret
+#	iret

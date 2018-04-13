@@ -42,6 +42,7 @@ void *malloc_pages(size_t pages) {
     
     if (heap_end - ((uint32_t) block) >= 2 * sizeof(metadata_t) + sizeof(size_t) + 4) {
         // make new block to take up the space
+        //printf("Block: %#.8X  HEnd: %#.8X  Size: %#.5X\n", block, heap_end, heap_end - ((uint32_t) block) - (2 * sizeof(metadata_t)) - sizeof(size_t));
         block->size = heap_end - ((uint32_t) block) - (2 * sizeof(metadata_t)) - sizeof(size_t);
         block->used = false;
         *ENDING_SIZE_FIELD(block) = block->size;
@@ -62,6 +63,15 @@ void *malloc_pages(size_t pages) {
     
     return end + 1;
 }
+
+void print_heap() {
+    metadata_t *block = start;
+    while (block != end) {
+        printf("***Phys Loc: %#.8X;  Virt Loc: %#.8X;   Size: %#.4X  Used: %u\n", get_physical_address(block), block, block->size, block->used);
+        block = NEXT_BLOCK(block);
+    }
+    printf("***Phys Loc: %#.8X;  Virt Loc: %#.8X;   Size: %#.4X  Used: %u\n", get_physical_address(end), end, end->size, end->used);
+}
 #endif
 
 void *malloc(size_t size) {
@@ -70,7 +80,7 @@ void *malloc(size_t size) {
 
     if (!start || (uint32_t) start >= heap_end) {
         start = end = alloc_page(NUM_PAGES((uint32_t) start, END_BLOCK(start, size)));
-        heap_end = ((uint32_t) start) + PAGE_SIZE;
+        heap_end = ((uint32_t) start) + (PAGE_SIZE * NUM_PAGES((uint32_t) start, END_BLOCK(start, size)));
         start->used = true;
         start->size = size;
         *ENDING_SIZE_FIELD(start) = size;
@@ -162,14 +172,4 @@ void free(void *ptr) {
             *ENDING_SIZE_FIELD(block) = PREV_BLOCK(block)->size;
         }
     } 
-    
-    else {
-        metadata_t *block = start;
-        while (block != end) {
-            printf("***Phys Loc: %#.8X;  Virt Loc: %#.8X;   Size: %5u  Used: %u\n", get_physical_address(block), block, block->size, block->used);
-            block = NEXT_BLOCK(block);
-        }
-        printf("***Phys Loc: %#.8X;  Virt Loc: %#.8X;   Size: %5u  Used: %u\n", get_physical_address(end), end, end->size, end->used);
-    }
-    
 }

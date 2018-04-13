@@ -2,5 +2,6 @@
 .global _start
 _start:
     call main
-l:
-    jmp l
+    
+    mov $0x02, %eax
+    int $0x80

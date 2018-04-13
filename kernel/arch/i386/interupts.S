@@ -1,27 +1,45 @@
+.section .data
+.global sys_call_table
+sys_call_table:
+.long sys_print
+.long yield
+.long exit
+.long get_pid
+.long fork
+
 .section .text
 
 # System Call Handler
 .global interupt_handler_128
 interupt_handler_128:
+    push %eax
     push %ebx
     push %ecx
     push %edx
+
+    push %esi
+    push %edi
+
     push %ebp
-    push %eax
 
-#     push %esp
-#     call print_eax
-#     add $4, %esp
-    # cli
-# lll:
-    # jmp lll
-    call puts
+    shl $2, %eax                   # eax *= 4
+    mov sys_call_table(%eax), %eax # eax = sys_call_table[eax]
+    call *%eax                     # call eax
 
-    pop %eax
+    call sys_return                # sys calls should call this method explicitly at their end to stop compiler errors, otherwise gcc modifies stack
+
+.global sys_return
+sys_return:
+    add $4, %esp
     pop %ebp
+
+    pop %edi
+    pop %esi
+
     pop %edx
     pop %ecx
     pop %ebx
+    pop %eax
     iret
 
 .macro no_error_code_interupt_handler n
@@ -44,13 +62,19 @@ common_interupt_handler:
     push %ebx
     push %ecx
     push %edx
+
+    push %esi
+    push %edi
+ 
     push %ebp
-    push %esp
 
     call interupt_handler
 
-    add $4, %esp
     pop %ebp
+    
+    pop %edi
+    pop %esi
+
     pop %edx
     pop %ecx
     pop %ebx

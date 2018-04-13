@@ -13,6 +13,7 @@ void abort(void);
 
 #if defined(__is_kernel)
 void *malloc_pages(size_t pages);
+void  print_heap();
 #endif
 
 void *malloc(size_t size);

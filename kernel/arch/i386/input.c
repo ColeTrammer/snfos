@@ -5,7 +5,10 @@
 #include <kernel/input.h>
 #include "interupts.h"
 #include "io.h"
+#include "sysreturn.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <kernel/process.h>
 
 #define PIC1		0x20		/* IO base address for master PIC */
 #define PIC2		0xA0		/* IO base address for slave PIC */
@@ -206,34 +209,26 @@ void print_eax(uint32_t eax) {
     printf("ASM: %#.8X\n", eax);
 }
 
-struct cpu_state {
-    uint32_t esp;
-    uint32_t ebp;
+void print_edx() {
     uint32_t edx;
-    uint32_t ecx;
-    uint32_t ebx;
-    uint32_t eax;
-} __attribute__((packed));
+    asm("mov %%edx, %0" : "=r"(edx));
+    printf("EDX: %#.8X\n", edx);
+}
 
-struct stack_state {
-    uint32_t error_code;
-    uint32_t eip;
-    uint32_t cs;
-    uint32_t eflags;
-} __attribute__((packed));
-
-void interupt_handler(struct cpu_state cpu, uint32_t interupt, struct stack_state stack) {
-    //printf("Int: %d, Eax: %#X, Error: %d\n", interupt, cpu.eax, stack.error_code);
+void interupt_handler(cpu_state_t cpu, uint32_t interupt, uint32_t error_code, stack_state_t stack) {
+    //printf("Int: %d, Eax: %#X, Error: %d\n", interupt, cpu.eax, error_code);
+    //printf("Error Code: %d\nEip: %#.8X\nEdx: %#.8X\nEcx: %#.8X\nEbx: %#.8X\nEax: %#.8X\nEsi: %#.8X\nEdi: %#.8X\nEbp: %#.8X\nCs:  %#.2X\nEsp: %#.8X\nSs:  %#.2X\nEflags: %#.8X\n", error_code, stack.eip, cpu.edx, cpu.ecx, cpu.ebx, cpu.eax, cpu.esi, cpu.edi, cpu.ebp, stack.cs, stack.esp, stack.ss, stack.eflags);
+    //uint32_t error_code = 0xABCD;
     if (interupt > 0x20 - 1 && interupt < 0x20 + 16) {
         if (interupt - 0x20 == 1) {
             uint8_t code = read_scan_code();
-            //printf("%d\n", code);
+            //printf("Eip: %#.8X\n", stack.eip);
             if (code < 129) {
                 char c = key_code_map[code];
                 printf("%c", c);
             }
         } else {
-            printf("Int: %d, Eax: %#X, Error: %d\n", interupt, cpu.eax, stack.error_code);    
+            printf("Int: %d, Eax: %#X, Error: %d\n", interupt, cpu.eax, error_code);    
         }
         PIC_sendEOI(interupt - 0x20);
     } else if (interupt != 255) {
@@ -242,12 +237,17 @@ void interupt_handler(struct cpu_state cpu, uint32_t interupt, struct stack_stat
             uint32_t cr3;
             asm("mov %%cr2, %0" : "=r" (cr2));
             asm("mov %%cr3, %0" : "=r" (cr3));
-            printf("CR2: %#.8X   Error Code: %d   Eip: %#.8X   CR3: %#.8X\n", cr2, stack.error_code, stack.eip, cr3);
+            printf("CR2: %#.8X Error Code: %d Eip: %#.8X CR3: %#.8X\nEdx: %#.8X\nEcx: %#.8X\nEbx: %#.8X\nEax: %#.8X\nEsi: %#.8X\nEdi: %#.8X\nEbp: %#.8X\nCs: %#.2X\nEsp: %#.8X\nSs: %#.2X\nEflags: %#.8X\n", cr2, error_code, stack.eip, cr3, cpu.edx, cpu.ecx, cpu.ebx, cpu.eax, cpu.esi, cpu.edi, cpu.ebp, stack.cs, stack.esp, stack.ss, stack.eflags);
             while (1);
         } else { 
-            printf("Int: %d, Eax: %#.8X, Error: %d, Eip: %#.8X\n", interupt, cpu.eax, stack.error_code, stack.eip);
+            printf("Int: %d, Eax: %#.8X, Error: %d, Eip: %#.8X\n", interupt, cpu.eax, error_code, stack.eip);
         }
     }
+}
+
+void sys_print(process_state_t process_state) {
+    puts((char*) process_state.cpu.ebx);
+    sys_return(process_state);
 }
 
 void init_handlers(uint32_t handlers[]) {

@@ -126,7 +126,7 @@ uint32_t get_physical_address(void *_virtual_address) {
 
     uint32_t page_directory_offset = virtual_address >> 22;
     uint32_t page_table_offset = (virtual_address >> 12) & 0x03FF;
-
+    
     page_table_t *page_table = PAGE_TABLE(page_directory_offset);
     return (page_table->entries[page_table_offset] & 0xFFFFF000) | (((uint32_t) _virtual_address) & 0x00000FFF);
 }
@@ -134,6 +134,7 @@ uint32_t get_physical_address(void *_virtual_address) {
 void init_bitmap(multiboot_info_t *info) {
     mark_used((void*) 0, PHYS_KERNEL_START / PAGE_SIZE);                //Reserves 1MB
     mark_used((void*) PHYS_KERNEL_START, NUM_INITIAL_KERNEL_PAGES);
+    mark_used((void*) (((uint32_t) info) - 0xC0000000), NUM_PAGES((uint32_t) info, ((uint32_t) info) + sizeof(multiboot_info_t)));
     multiboot_module_t *modules = (multiboot_module_t*) info->mods_addr;
     for (size_t i = 0; i < info->mods_count; i++) {
         mark_used((void*) modules[i].mod_start, NUM_PAGES(modules[i].mod_start, modules[i].mod_end));

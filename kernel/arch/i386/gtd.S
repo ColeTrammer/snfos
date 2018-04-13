@@ -76,8 +76,10 @@ load_gdt:
 
 load_kernel:
 	mov $0x10, %cx
+    mov %cx, %ss
+
+    mov $(0x20 | 0x03), %cx
 	mov %cx, %ds
-	mov %cx, %ss
 	mov %cx, %es
 	mov %cx, %fs
 	mov %cx, %gs
