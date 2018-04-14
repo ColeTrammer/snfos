@@ -1,4 +1,4 @@
-//#include <stdint.h>
+#include <unistd.h>
 
 /*void inc_a(int *a) {
   *a = *a + 1;
@@ -25,7 +25,7 @@ void yield() {
       : : : "eax");
 }
 
-unsigned int get_pid() {
+pid_t get_pid() {
   unsigned int pid;
   asm("mov $3, %%eax\n"\
       "int $0x80\n"\
@@ -34,22 +34,13 @@ unsigned int get_pid() {
   return pid;
 }
 
-unsigned int fork() {
-  unsigned int res;
-  asm("mov $4, %%eax\n"\
-      "int $0x80\n"\
-      "mov %%ecx, %0\n"
-      : "=m"(res) : : "eax", "ecx");
-  return res;
-}
-
 void main(void) {
-    unsigned int res = fork();
+    pid_t res = fork();
     if (res == -1) {
-      print("Error");
+      print("error");
       return;
     } 
-
+    
     char *s = "";
     if (res == 0) {
       s = "pid: _ :: child";

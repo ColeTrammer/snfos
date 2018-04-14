@@ -17,15 +17,14 @@ title os
 kernel /boot/snfos.kernel
 
 module /modules/program1.bin
-module /modules/program2.bin
 EOF
 
 cd ./kernel/modules
-i686-elf-as -o start.o start.S
-i686-elf-gcc -o program1.o program1.c start.o -m32 -O2 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -T link.ld
+i686-elf-as -o ../../sysroot/usr/lib/crt0.o ../../libc/arch/i386/crt0.S
+i686-elf-as -o ../../sysroot/usr/lib/crti.o ../../libc/arch/i386/crti.S
+i686-elf-as -o ../../sysroot/usr/lib/crtn.o ../../libc/arch/i386/crtn.S
+i686-elf-gcc -o program1.o program1.c -O2 -T link.ld
 i686-elf-objcopy -O binary program1.o ../../isodir/modules/program1.bin
-i686-elf-gcc -o program2.o program2.c start.o -m32 -O2 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -T link.ld
-i686-elf-objcopy -O binary program2.o ../../isodir/modules/program2.bin
 cd ../..
 
 genisoimage -R                              \

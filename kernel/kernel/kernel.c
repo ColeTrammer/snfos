@@ -23,7 +23,7 @@ multiboot_info_t *virtualize_multiboot_info(uint32_t ebx) {
 }
 
 void kernel_main(uint32_t eax, uint32_t ebx) {
-	
+
 	terminal_initialize();
 	if (eax != 0x2BADB002) {
 		printf("ERROR: INVALID BOOTLOADER\neax: %#.8X\nebx: %#.8X\n", eax, ebx);
@@ -34,13 +34,13 @@ void kernel_main(uint32_t eax, uint32_t ebx) {
 	init_bitmap(mbinfo);
 	
 	initialize_input();
-	
+
 	multiboot_module_t *module = (multiboot_module_t*) mbinfo->mods_addr;
 	
 	process_memory_t *process1 = load_module(module);
 	//process_memory_t *process2 = load_module(module + 1);
 
-	if (mbinfo->mods_count == 2 && mbinfo->flags & (1 << 3)) {
+	if (mbinfo->mods_count == 1 && mbinfo->flags & (1 << 3)) {
 		//printf("Start: %#.8X\nEnd:   %#.8X\nString: %s\n", module->mod_start, module->mod_end, module->cmdline + 0xC0000000);
 		//printf("Process:        %#.8X\n", process);
 		//printf("Phys PD: %#.8X\n", get_physical_address(&process2->page_directory));

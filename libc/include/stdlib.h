@@ -21,6 +21,13 @@ void *calloc(size_t items, size_t size);
 void *realloc(void *ptr, size_t size);
 void  free(void *ptr);
 
+int atexit(void (*function)(void));
+int atoi(const char *nptr);
+char *getenv(const char *name);
+
+__attribute__((__noreturn__))
+void exit(int status);
+
 #ifdef __cplusplus
 }
 #endif

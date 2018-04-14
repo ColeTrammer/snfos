@@ -72,7 +72,7 @@ void yield(process_state_t process_state) {
     //print_edx();
 }
 
-void exit(/*process_state_t process_state*/) {
+void handle_exit(/*process_state_t process_state*/) {
     if (current == first && current == last) {
         asm("sti");
         while (1);

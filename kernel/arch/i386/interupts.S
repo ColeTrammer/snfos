@@ -3,7 +3,7 @@
 sys_call_table:
 .long sys_print
 .long yield
-.long exit
+.long handle_exit
 .long get_pid
 .long fork
 
