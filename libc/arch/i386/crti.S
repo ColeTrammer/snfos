@@ -8,4 +8,4 @@ _init:
 .global _fini
 _fini:
     push %ebp
-    mov %ebp, %esp
+    mov %esp, %ebp

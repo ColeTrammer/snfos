@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdio.h>
 
 /*void inc_a(int *a) {
   *a = *a + 1;
@@ -11,13 +12,6 @@
   (*a)++;
   *a <<= 4;
 }*/
-
-void print(const char *s) {
-    asm("mov $0, %%eax\n"\
-        "mov %0, %%ebx\n"\
-        "int $0x80\n"
-         : : "r" (s) : "eax", "ebx");
-}
 
 void yield() {
   asm("mov $1, %%eax\n"\
@@ -34,11 +28,11 @@ pid_t get_pid() {
   return pid;
 }
 
-void main(void) {
+void main(/*int argc, char *argv[]*/) {
     pid_t res = fork();
     if (res == -1) {
-      print("error");
-      return;
+      puts("error");
+      return /*1*/;
     } 
     
     char *s = "";
@@ -51,8 +45,9 @@ void main(void) {
       s[20] = res + '0';
     }
 
-    for (int i = 0; i < 10; i++) {
-      print(s);
-      yield();
+    for (int i = 0; i < 1; i++) {
+      puts(s);
+      //yield();
     }
+    return /*0*/;
 }  

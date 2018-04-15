@@ -93,13 +93,18 @@ void handle_exit(/*process_state_t process_state*/) {
     process_t *next = current->next;
 
     load_cr3(get_physical_address(next->process_memory->page_directory));
-
+    
+    /* THIS ENTIRE SYSTEM IS FUCKED <=> IDK HOW TO FIX YET */
     free(current->process_memory->page_directory);
     for (size_t i = 0; i < MAX_PAGE_DIRECTORY_ENTRIES; i++) {
         if (current->process_memory->page_tables[i]) {
             free(current->process_memory->page_tables[i]->page_table);
             for (size_t j = 0; j < MAX_PAGE_TABLE_ENTRIES; j++) {
+                //printf("Page: %#.8X\n", current->process_memory->page_tables[i]->pages[i]);
                 free(current->process_memory->page_tables[i]->pages[j]);
+                if (i == 0) {//code pages are contiguous <=> others are not
+                    break;
+                }
             }
             free(current->process_memory->page_tables[i]);
         }

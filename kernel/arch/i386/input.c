@@ -237,7 +237,7 @@ void interupt_handler(cpu_state_t cpu, uint32_t interupt, uint32_t error_code, s
             uint32_t cr3;
             asm("mov %%cr2, %0" : "=r" (cr2));
             asm("mov %%cr3, %0" : "=r" (cr3));
-            printf("CR2: %#.8X Error Code: %d Eip: %#.8X CR3: %#.8X\nEdx: %#.8X\nEcx: %#.8X\nEbx: %#.8X\nEax: %#.8X\nEsi: %#.8X\nEdi: %#.8X\nEbp: %#.8X\nCs: %#.2X\nEsp: %#.8X\nSs: %#.2X\nEflags: %#.8X\n", cr2, error_code, stack.eip, cr3, cpu.edx, cpu.ecx, cpu.ebx, cpu.eax, cpu.esi, cpu.edi, cpu.ebp, stack.cs, stack.esp, stack.ss, stack.eflags);
+            printf("CR2: %#.8X Error Code: %d Eip: %#.8X CR3: %#.8X\nEdx: %#.8X Ecx: %#.8X Ebx: %#.8X Eax: %#.8X\nEsi: %#.8X Edi: %#.8X Ebp: %#.8X Cs: %#.2X\nEsp: %#.8X Ss: %#.2X Eflags: %#.8X\n", cr2, error_code, stack.eip, cr3, cpu.edx, cpu.ecx, cpu.ebx, cpu.eax, cpu.esi, cpu.edi, cpu.ebp, stack.cs, stack.esp, stack.ss, stack.eflags);
             while (1);
         } else { 
             printf("Int: %d, Eax: %#.8X, Error: %d, Eip: %#.8X\n", interupt, cpu.eax, error_code, stack.eip);
@@ -246,7 +246,8 @@ void interupt_handler(cpu_state_t cpu, uint32_t interupt, uint32_t error_code, s
 }
 
 void sys_print(process_state_t process_state) {
-    puts((char*) process_state.cpu.ebx);
+    printf("%s", (char*) process_state.cpu.ebx);
+    process_state.cpu.ecx = true;
     sys_return(process_state);
 }
 

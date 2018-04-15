@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#if defined(__is_libk)
 static bool print(const char* data, size_t length) {
 	const unsigned char* bytes = (const unsigned char*) data;
 	for (size_t i = 0; i < length; i++)
@@ -12,6 +13,17 @@ static bool print(const char* data, size_t length) {
 			return false;
 	return true;
 }
+#else
+static bool print(const char *s, size_t length) {
+	bool worked;
+	asm("mov $0, %%eax\n"\
+        "mov %1, %%ebx\n"\
+        "int $0x80\n"\
+		"mov %%ecx, %0"
+         : "=m"(worked) : "r" (s) : "eax", "ebx");
+	return worked;
+}
+#endif
  
 static int parseInt(const char* num, size_t length) {
 	int n = 0;

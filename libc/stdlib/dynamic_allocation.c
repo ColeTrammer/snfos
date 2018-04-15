@@ -140,10 +140,10 @@ void *realloc(void *ptr, size_t size) {
 }
 
 void free(void *ptr) {
-    if (ptr) {
-        metadata_t *block = ((metadata_t*) ptr) - 1;
+    metadata_t *block = ((metadata_t*) ptr) - 1;
+    //printf("Blok: %#.8X\n", ((metadata_t*) block) - 1);
+    if (ptr != NULL && block->used) {
         block->used = false;
-        
         /* Could give back memory to page frame allocator but it makes the allocator much slower
 
         if (block == end && PAGE_BOUNDARY_END(block) < heap_end) {

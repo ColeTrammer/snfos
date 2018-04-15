@@ -9,7 +9,7 @@ _start:
 
     call initialize_standard_library
 
-    # call _init
+    call _init
 
     call main
 
