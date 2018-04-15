@@ -28,11 +28,11 @@ pid_t get_pid() {
   return pid;
 }
 
-void main(/*int argc, char *argv[]*/) {
+int main(int argc, char *argv[]) {
     pid_t res = fork();
     if (res == -1) {
       puts("error");
-      return /*1*/;
+      return 1;
     } 
     
     char *s = "";
@@ -47,7 +47,7 @@ void main(/*int argc, char *argv[]*/) {
 
     for (int i = 0; i < 1; i++) {
       puts(s);
-      //yield();
+      yield();
     }
-    return /*0*/;
+    return 0;
 }  

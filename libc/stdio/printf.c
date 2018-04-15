@@ -18,9 +18,10 @@ static bool print(const char *s, size_t length) {
 	bool worked;
 	asm("mov $0, %%eax\n"\
         "mov %1, %%ebx\n"\
+		"mov %2, %%ecx\n"\
         "int $0x80\n"\
 		"mov %%ecx, %0"
-         : "=m"(worked) : "r" (s) : "eax", "ebx");
+         : "=m"(worked) : "r"(s), "r"(length) : "eax", "ebx", "ecx");
 	return worked;
 }
 #endif
