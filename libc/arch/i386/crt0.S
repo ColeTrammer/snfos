@@ -1,4 +1,4 @@
-.section .text
+.section .text.startup
 
 .global _start
 _start: 
@@ -9,11 +9,15 @@ _start:
 
     call initialize_standard_library
 
+    add $16, %esp
+    push %ebx # argv
+    push %eax # argc
+
     call _init
 
     call main
 
-    push %ecx
+    push %eax
     call exit
 
 .size _start, . - _start

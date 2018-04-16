@@ -23,12 +23,15 @@ pid_t get_pid() {
   unsigned int pid;
   asm("mov $3, %%eax\n"\
       "int $0x80\n"\
-      "mov %%ecx, %0\n"
-      : "=m"(pid) : : "eax", "ecx");
+      "mov %%eax, %0\n"
+      : "=m"(pid) : : "eax");
   return pid;
 }
 
 int main(int argc, char *argv[]) {
+    printf("Argc: %u\n", argc);
+    printf("Argv[0]: %s\n", argv[0]);
+
     pid_t res = fork();
     if (res == -1) {
       puts("error");

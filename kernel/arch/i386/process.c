@@ -28,7 +28,7 @@ static inline void load_cr3(uint32_t cr3) {
         : : "m"(cr3) : "edx");
 }
 
-process_t *add_process(process_memory_t *process_memory) {
+process_t *add_process(process_memory_t *process_memory, uint32_t argc, char *argv[], uint32_t envc, char *envp[]) {
     process_t *new_process;
     if (!first) {
         new_process = first = last = malloc(sizeof(process_t));
@@ -51,6 +51,50 @@ process_t *add_process(process_memory_t *process_memory) {
     first->prev       = new_process;
     last->next        = new_process;
     last = new_process;
+
+    new_process->process_memory->page_tables[1] = calloc(1, sizeof(process_page_table_t));
+    new_process->process_memory->page_tables[1]->page_table = malloc_pages(1);
+    memset(new_process->process_memory->page_tables[1]->page_table, 0, PAGE_SIZE);
+    new_process->process_memory->page_directory->entries[1] = get_physical_address(process_memory->page_tables[1]->page_table) | 0x07;
+
+    new_process->process_memory->page_tables[1]->pages[0] = malloc_pages(1);
+    new_process->process_memory->page_tables[1]->page_table->entries[0] = get_physical_address(new_process->process_memory->page_tables[1]->pages[0]) | 0x07;
+
+    memcpy(((char*) new_process->process_memory->page_tables[1]->pages[0]) + 4, argv[0], strlen(argv[0]));
+    *((uint32_t*) new_process->process_memory->page_tables[1]->pages[0]) = (1 << 22) | (0 << 12) | 4;
+
+    new_process->process_state.cpu.edx = (uint32_t) envp;
+    new_process->process_state.cpu.ecx = envc;
+    new_process->process_state.cpu.ebx = (1 << 22) | (0 << 12);
+    new_process->process_state.cpu.eax = argc;
+
+    return new_process;
+}
+
+process_t *add_forked_process(process_memory_t *process_memory) {
+     process_t *new_process;
+    if (!first) {
+        new_process = first = last = malloc(sizeof(process_t));
+        first->prev = NULL;
+    } else {
+        new_process = malloc(sizeof(process_t));
+    }
+    new_process->process_memory = process_memory;
+    new_process->ring0 = false;
+    new_process->pid = pid_inc++;
+
+    new_process->process_state.stack.ss     = 0x20 | 0x03;
+    new_process->process_state.stack.esp    = KERNEL_VIRTUAL_BASE - 4;
+    new_process->process_state.stack.eflags = 0x10 | 0x200;
+    new_process->process_state.stack.cs     = 0x18 | 0x03;
+    new_process->process_state.stack.eip    = 0x0;
+
+    new_process->prev = last;
+    new_process->next = first;
+    first->prev       = new_process;
+    last->next        = new_process;
+    last = new_process;
+
     return new_process;
 }
 
@@ -72,7 +116,11 @@ void yield(process_state_t process_state) {
     //print_edx();
 }
 
-void handle_exit(/*process_state_t process_state*/) {
+void handle_exit(process_state_t process_state) {
+    if (process_state.cpu.ebx != 0) {
+        printf("Error: Process exited with code %u.", process_state.cpu.ebx);
+    }
+
     if (current == first && current == last) {
         asm("sti");
         while (1);
@@ -136,14 +184,14 @@ void fork(process_state_t process_state) {
     }
     new_process_memory->page_directory->entries[LAST_PAGE_DIRECTORY_INDEX] = get_physical_address(new_process_memory->page_directory) | 0x03;
 	new_process_memory->page_directory->entries[KERNEL_VIRTUAL_BASE >> 22] = KERNEL_PAGE_TABLE_PHYSICAL_ADDRESS | 0x03;
-    process_t *new_process = add_process(new_process_memory);
+    process_t *new_process = add_forked_process(new_process_memory);
     memcpy(&new_process->process_state, &process_state, sizeof(process_state_t));
-    new_process->process_state.cpu.ecx = 0;
-    process_state.cpu.ecx = new_process->pid;
+    new_process->process_state.cpu.eax = 0;
+    process_state.cpu.eax = new_process->pid;
     sys_return(process_state);
 }
 
 void get_pid(process_state_t process_state) {
-    process_state.cpu.ecx = current->pid;
+    process_state.cpu.eax = current->pid;
     sys_return(process_state);
 }

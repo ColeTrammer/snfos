@@ -246,8 +246,10 @@ void interupt_handler(cpu_state_t cpu, uint32_t interupt, uint32_t error_code, s
 }
 
 void sys_print(process_state_t process_state) {
-    printf("%s", (char*) process_state.cpu.ebx);
-    process_state.cpu.ecx = true;
+    for (size_t i = 0; i < process_state.cpu.ecx; i++) {
+        printf("%c", ((char*) process_state.cpu.ebx)[i]);
+    }
+    process_state.cpu.eax = true;
     sys_return(process_state);
 }
 

@@ -50,7 +50,12 @@ void kernel_main(uint32_t eax, uint32_t ebx) {
 		//printf("Virt Ad: %#.8X\n", &process2->page_directory);
 		//free(NULL);
 		//free(malloc(1));
-		process_t *p1 = add_process(process1);
+		uint32_t argc = 1;
+		uint32_t envc = 0;
+		char *envp[envc];
+		char *argv[argc];
+		argv[0] = "Process1";
+		process_t *p1 = add_process(process1, argc, argv, envc, envp);
 		///*process_t *p2 = */add_process(process2);
 		run_process(p1);
 	}		

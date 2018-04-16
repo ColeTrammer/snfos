@@ -3,6 +3,7 @@
 
 #include <kernel/page.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 struct _cpu_state {
     uint32_t ebp;
@@ -58,7 +59,7 @@ struct _process {
 
 typedef struct _process process_t;
 
-process_t *add_process(process_memory_t *process_memory);
+process_t *add_process(process_memory_t *process_memory, uint32_t argc, char *argv[], uint32_t envc, char *envp[]);
 void run_process(process_t *process);
 
 #endif
