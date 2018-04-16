@@ -10,3 +10,4 @@ done
 rm -rf isodir
 rm -rf snfos.iso
 rm -rf dump debug kernel.dis logs.txt os.iso program.dis program1.dis program2.dis
+rm -rf modules/*.o

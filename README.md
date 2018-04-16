@@ -6,7 +6,7 @@ Created exploratorily to understand how Functional OS's work...
 
 # To build
 * preferable to install qemu and run ./qemu.sh to run the OS virtually.
-* need to create the snfos version of gcc and binutils, a process detailed at OS Dev Wiki.
+* need to create the snfos version of gcc and binutils, a process detailed at OS Dev Wiki. The changes to the source are provided in ports
 
 # Notes
 * Needs to be be completely redesigned to accomodate symmetric multi processing and probably a bunch of other stuff.
