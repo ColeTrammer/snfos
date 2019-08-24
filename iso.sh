@@ -13,7 +13,7 @@ cat > isodir/boot/grub/menu.lst << EOF
 default=0
 timeout=0
 
-title os
+title snfos
 kernel /boot/snfos.kernel
 
 module /modules/program1.bin
